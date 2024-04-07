@@ -56,39 +56,22 @@ Resources:
           - Name: standard
             ComputeResources:
             - Name: queue1-cr
-              InstanceType: r6a.large
+              InstanceType: t2.micro
               MinCount: 0
-              MaxCount: 12
+              MaxCount: 1
             Networking:
               SubnetIds:
               -  !GetAtt [ PclusterVpc , Outputs.PrivateSubnetId ]
           - Name: medium
             ComputeResources:
               - Name: queueu2-cr
-                InstanceType: r6a.4xlarge
+                InstanceType: t2.micro
                 MinCount: 0
-                MaxCount: 12
+                MaxCount: 1
             Networking:
                 SubnetIds:
                 -  !GetAtt [ PclusterVpc , Outputs.PrivateSubnetId ]
-          - Name: high
-            ComputeResources:
-              - Name: queueu3-cr
-                InstanceType: r6a.8xlarge
-                MinCount: 0
-                MaxCount: 6
-            Networking:
-                SubnetIds:
-                -  !GetAtt [ PclusterVpc , Outputs.PrivateSubnetId ]
-          - Name: queue-2
-            ComputeResources:
-              - Name: queueu2-cr
-                InstanceType: g4ad.8xlarge
-                MinCount: 0
-                MaxCount: 4
-            Networking:
-                SubnetIds:
-                -  !GetAtt [ PclusterVpc , Outputs.PrivateSubnetId ]
+        
 
 Outputs:
   HeadNodeIp:
