@@ -6,7 +6,7 @@
    - name: Create a login user
      user:
       name: test-pc
-      password: $1$SomeSalt$UqddPX3r4kH3UL5jq5/ZI.
+      password: "$6$pCNgiQprrT/EmeE5$G7wa6wYm1FyuBHeVsuyH9IXGju07csuFwtrynslvSz6O.wFv4Ub8ADPqlBseewQQZQfp.9LCkWyodvJQjH.fe0"
       groups: wheel   
       state: present
 
