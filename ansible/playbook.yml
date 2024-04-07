@@ -1,0 +1,12 @@
+- name: play1
+  hosts: all
+  remote_user: ec2-user
+  become: true
+  tasks:
+   - name: Create a login user
+     user:
+      name: test-pc
+      password: 'test'
+      groups: wheel   
+      state: present
+

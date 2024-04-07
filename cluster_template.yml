@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  AWSParallelCluster CloudFormation Template
+
+Parameters:
+  KeyName:
+    Description: KeyPair to login to the head node
+    Type: AWS::EC2::KeyPair::KeyName
+
+  AvailabilityZone:
+    Description: Availability zone where instances will be launched
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: us-east-1a
+
+Mappings:
+  ParallelCluster:
+    Constants:
+      Version: 3.7.0
+
+Resources:
+  PclusterClusterProvider:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://${AWS::Region}-aws-parallelcluster.s3.${AWS::Region}.${AWS::URLSuffix}/parallelcluster/${Version}/templates/custom_resource/cluster.yaml
+        - { Version: !FindInMap [ParallelCluster, Constants, Version] }
+
+  PclusterVpc:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        PublicCIDR: 10.0.0.0/24
+        PrivateCIDR: 10.0.16.0/20
+        AvailabilityZone: !Ref AvailabilityZone
+      TemplateURL: !Sub
+        - https://${AWS::Region}-aws-parallelcluster.s3.${AWS::Region}.${AWS::URLSuffix}/parallelcluster/${Version}/templates/networking/public-private-${Version}.cfn.json
+        - { Version: !FindInMap [ParallelCluster, Constants, Version ] }
+
+  PclusterCluster:
+    Type: Custom::PclusterCluster
+    Properties:
+      ServiceToken: !GetAtt [ PclusterClusterProvider , Outputs.ServiceToken ]
+      ClusterName: !Sub 'c-${AWS::StackName}'
+      ClusterConfiguration:
+        Image:
+          Os: alinux2
+        HeadNode:
+          InstanceType: t2.medium
+          Networking:
+            SubnetId: !GetAtt [ PclusterVpc , Outputs.PublicSubnetId ]
+          Ssh:
+            KeyName: !Ref KeyName
+        Scheduling:
+          Scheduler: slurm
+          SlurmQueues:
+          - Name: standard
+            ComputeResources:
+            - Name: queue1-cr
+              InstanceType: r6a.large
+              MinCount: 0
+              MaxCount: 12
+            Networking:
+              SubnetIds:
+              -  !GetAtt [ PclusterVpc , Outputs.PrivateSubnetId ]
+          - Name: medium
+            ComputeResources:
+              - Name: queueu2-cr
+                InstanceType: r6a.4xlarge
+                MinCount: 0
+                MaxCount: 12
+            Networking:
+                SubnetIds:
+                -  !GetAtt [ PclusterVpc , Outputs.PrivateSubnetId ]
+          - Name: high
+            ComputeResources:
+              - Name: queueu3-cr
+                InstanceType: r6a.8xlarge
+                MinCount: 0
+                MaxCount: 6
+            Networking:
+                SubnetIds:
+                -  !GetAtt [ PclusterVpc , Outputs.PrivateSubnetId ]
+          - Name: queue-2
+            ComputeResources:
+              - Name: queueu2-cr
+                InstanceType: g4ad.8xlarge
+                MinCount: 0
+                MaxCount: 4
+            Networking:
+                SubnetIds:
+                -  !GetAtt [ PclusterVpc , Outputs.PrivateSubnetId ]
+
+Outputs:
+  HeadNodeIp:
+    Description: The Public IP address of the HeadNode
+    Value: !GetAtt [ PclusterCluster, headNode.publicIpAddress ]

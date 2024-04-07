@@ -1,0 +1,45 @@
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: 'AWS Region'
+        required: true
+        default: 'us-east-1'
+      az:
+        description: 'AWS Region'
+        required: true
+        default: 'us-east-1a'
+         
+      keypair:
+        description: 'SSH Key Pair'
+        required: true
+        default: pc-key
+
+jobs:
+  Deploy-PC:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+         aws-region: ${{ github.event.inputs.region}}
+
+      - name: Setting up SSH key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem 
+
+      - name: deploy cluster
+        run: |
+          aws cloudformation deploy --template-file ./cluster_template.yml --stack-name mycluster --parameter-overrides KeyName=${{ github.event.inputs.keypair}}  AvailabilityZone=${{ github.event.inputs.az}}  --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND 
+          aws cloudformation describe-stacks --stack-name=mycluster --query "Stacks|[0].Outputs[?OutputKey=='HeadNodeIp']|[0].OutputValue" --output=text >> /ansible/inventory.txt
+          ansible-playbook  ./ansible/playbook.yaml -i ./ansible/inventory.txt --private-key=private_key.pem
+    
+
