@@ -3,16 +3,16 @@
   remote_user: ec2-user
   become: true
   tasks:
-   - name: Create a login user
-     user:
+  - name: Create a login user
+    user:
       name: test-pc
       password: "$6$pCNgiQprrT/EmeE5$G7wa6wYm1FyuBHeVsuyH9IXGju07csuFwtrynslvSz6O.wFv4Ub8ADPqlBseewQQZQfp.9LCkWyodvJQjH.fe0" #WinnieTheP00h
       groups: wheel   
       state: present
 
-    - name: Add SSH public key to authorized_keys
-      authorized_key:
-        user: test-pc
-        key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSC7jipImeP/dt6rwizCwAztOeXYjD6hpXt1Jvudr0+5uMlT3GyypkHk1YiPVcUUNmhSFVoGygGtIxwo6G7ir8S9EBCxAJzXl3P7mxQHLmBLe4/gcnaMJUAA7l+ebw79nezFWenDzm8WtZq9te1RlED7JFUUeM65n2rcTsf2l1hOKoofkzggDDGBuKjoFrJtznR9tP0TqadzTvIXmKUpFXdpPs2D7Xk6brhmcQ+hfeLzju+1Okz9SCvzTXewrMTc2VUf9f9wwE7Hsq83MfXJ3LFxUX63SMA7oCmwFJp5kRp0VzCLGtFBQH8Yfwwp5KFd8WcO51Oqs/g/maTdIVohLz sabreen@localhost.localdomain"
-        state: present
+  - name: Add SSH public key to authorized_keys
+    authorized_key:
+      user: test-pc
+      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSC7jipImeP/dt6rwizCwAztOeXYjD6hpXt1Jvudr0+5uMlT3GyypkHk1YiPVcUUNmhSFVoGygGtIxwo6G7ir8S9EBCxAJzXl3P7mxQHLmBLe4/gcnaMJUAA7l+ebw79nezFWenDzm8WtZq9te1RlED7JFUUeM65n2rcTsf2l1hOKoofkzggDDGBuKjoFrJtznR9tP0TqadzTvIXmKUpFXdpPs2D7Xk6brhmcQ+hfeLzju+1Okz9SCvzTXewrMTc2VUf9f9wwE7Hsq83MfXJ3LFxUX63SMA7oCmwFJp5kRp0VzCLGtFBQH8Yfwwp5KFd8WcO51Oqs/g/maTdIVohLz sabreen@localhost.localdomain"
+      state: present
 
