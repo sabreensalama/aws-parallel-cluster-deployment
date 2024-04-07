@@ -39,7 +39,7 @@ jobs:
       - name: deploy cluster
         run: |
           aws cloudformation deploy --template-file ./cluster_template.yml --stack-name mycluster --parameter-overrides KeyName=${{ github.event.inputs.keypair}}  AvailabilityZone=${{ github.event.inputs.az}}  --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND 
-          aws cloudformation describe-stacks --stack-name=mycluster --query "Stacks|[0].Outputs[?OutputKey=='HeadNodeIp']|[0].OutputValue" --output=text >> /ansible/inventory.txt
+          aws cloudformation describe-stacks --stack-name=mycluster --query "Stacks|[0].Outputs[?OutputKey=='HeadNodeIp']|[0].OutputValue" --output=text >> ./ansible/inventory.txt
           ansible-playbook  ./ansible/playbook.yaml -i ./ansible/inventory.txt --private-key=private_key.pem
     
 
